@@ -2,7 +2,6 @@ package com.reactnativejsiviewhelpers;
 
 import androidx.annotation.NonNull;
 
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -10,25 +9,22 @@ import com.facebook.react.module.annotations.ReactModule;
 
 @ReactModule(name = JsiViewHelpersModule.NAME)
 public class JsiViewHelpersModule extends ReactContextBaseJavaModule {
-    public static final String NAME = "JsiViewHelpers";
+  public static final String NAME = "JsiViewHelpers";
+  private final JsiViewHelpers jsiViewHelpers;
 
-    public JsiViewHelpersModule(ReactApplicationContext reactContext) {
-        super(reactContext);
-    }
+  public JsiViewHelpersModule(ReactApplicationContext reactContext) {
+    super(reactContext);
+    jsiViewHelpers = new JsiViewHelpers(reactContext);
+  }
 
-    @Override
-    @NonNull
-    public String getName() {
-        return NAME;
-    }
+  @Override
+  @NonNull
+  public String getName() {
+    return NAME;
+  }
 
-
-    // Example method
-    // See https://reactnative.dev/docs/native-modules-android
-    @ReactMethod
-    public void multiply(int a, int b, Promise promise) {
-        promise.resolve(a * b);
-    }
-
-    public static native int nativeMultiply(int a, int b);
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public void install() {
+    jsiViewHelpers.install();
+  }
 }

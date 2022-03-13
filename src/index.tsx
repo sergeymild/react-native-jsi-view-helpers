@@ -1,4 +1,5 @@
-import { NativeModules, Platform } from 'react-native';
+import type React from 'react';
+import { findNodeHandle, NativeModules, Platform } from 'react-native';
 
 const LINKING_ERROR =
   `The package 'react-native-jsi-view-helpers' doesn't seem to be linked. Make sure: \n\n` +
@@ -17,6 +18,41 @@ const JsiViewHelpers = NativeModules.JsiViewHelpers
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return JsiViewHelpers.multiply(a, b);
+JsiViewHelpers.install();
+
+export interface MeasureParams {
+  text: string;
+  fontSize: number;
+  maxWidth: number;
+  allowFontScaling?: boolean;
+  usePreciseWidth?: boolean;
+  fontFamily?: string;
+}
+
+export interface MeasureTextResult {
+  height: number;
+  width: number;
+  lineCount: number;
+  lastLineWidth: number;
+}
+
+export interface MeasureViewResult {
+  height: number;
+  width: number;
+  x: number;
+  y: number;
+}
+
+export class viewHelpers {
+  static measureText(params: MeasureParams): MeasureTextResult {
+    // @ts-ignore
+    return global.__viewHelpers.measureText(params);
+  }
+
+  static measureView(ref: React.RefObject<any>): MeasureViewResult {
+    const viewId = findNodeHandle(ref.current);
+    if (!viewId) return { width: 0, height: 0, x: 0, y: 0 };
+    // @ts-ignore
+    return global.__viewHelpers.measureView(viewId);
+  }
 }
