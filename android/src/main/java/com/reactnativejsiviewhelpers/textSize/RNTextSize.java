@@ -202,7 +202,7 @@ public class RNTextSize {
           layout = StaticLayout.Builder.obtain(text, 0, text.length(), textPaint, hintWidth)
             .setAlignment(Layout.Alignment.ALIGN_NORMAL)
             .setBreakStrategy(conf.getTextBreakStrategy())
-            .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL)
+            //.setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL)
             .setIncludePad(includeFontPadding)
             .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER)
             .build();
