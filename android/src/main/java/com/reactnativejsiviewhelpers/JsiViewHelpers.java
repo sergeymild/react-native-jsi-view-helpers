@@ -137,8 +137,15 @@ public class JsiViewHelpers {
     try {
       if (nativeViewHierarchyManager == null) {
         UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);
-        Class<? extends UIImplementation> aClass = uiManager.getUIImplementation().getClass();
-        Method getUIViewOperationQueue = aClass.getDeclaredMethod("getUIViewOperationQueue");
+        Class<? extends UIImplementation> uiImplementationClass = uiManager.getUIImplementation().getClass();
+
+        String name = uiImplementationClass.getName();
+        while (!name.equals("com.facebook.react.uimanager.UIImplementation") && !name.equals("java.lang.Object") && uiImplementationClass != null) {
+          uiImplementationClass = (Class<? extends UIImplementation>) uiImplementationClass.getSuperclass();
+          name = uiImplementationClass.getName();
+        }
+
+        Method getUIViewOperationQueue = uiImplementationClass.getDeclaredMethod("getUIViewOperationQueue");
         getUIViewOperationQueue.setAccessible(true);
         UIViewOperationQueue queue = (UIViewOperationQueue) getUIViewOperationQueue.invoke(uiManager.getUIImplementation());
 
