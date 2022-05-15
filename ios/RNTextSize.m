@@ -10,8 +10,8 @@
 #import <CoreText/CoreText.h>
 #import "RNTextSize.h"
 #import "React/RCTConvert.h"   // Required when used as a Pod in a Swift project
-#import "React/RCTFont.h"
-#import "React/RCTUtils.h"
+#import <React/RCTFont.h>
+#import <React/RCTUtils.h>
 
 static NSString *const E_MISSING_TEXT = @"E_MISSING_TEXT";
 static NSString *const E_INVALID_FONT_SPEC = @"E_INVALID_FONT_SPEC";
@@ -49,6 +49,7 @@ static inline CGFloat CGFloatValueFrom(NSNumber * _Nullable num) {
          usePreciseWidth:(BOOL)usePreciseWidth
         allowFontScaling:(BOOL)allowFontScaling
               fontFamily:(NSString*)fontFamily
+                  weight:(NSString*)weight
 {
     // RCTConvert will return nil if the `options` object was not received.
     if (isNull(text)) {
@@ -70,7 +71,8 @@ static inline CGFloat CGFloatValueFrom(NSNumber * _Nullable num) {
     // does not scale the font if a custom delegate has been defined to create.
     UIFont *const _Nullable font = [self scaledUIFontFromUserSpecs:allowFontScaling
                                                           fontSize:fontSize
-                                                        fontFamily:fontFamily];
+                                                        fontFamily:fontFamily
+                                                            weight:weight];
     if (!font) {
         return @{
             @"width": @0,
@@ -216,14 +218,15 @@ static inline CGFloat CGFloatValueFrom(NSNumber * _Nullable num) {
 - (UIFont * _Nullable)scaledUIFontFromUserSpecs:(BOOL)allowFontScaling
                                        fontSize:(NSNumber*)fontSize
                                      fontFamily:(NSString*)fontFamily
+                                         weight:(NSString*)weight
 {
     
     RCTBridge* bridge = [RCTBridge currentBridge];
-    
     const CGFloat scaleMultiplier =
     allowFontScaling && bridge ? bridge.accessibilityManager.multiplier : 1.0;
     return [self UIFontFromUserSpecs:fontSize
                           fontFamily:fontFamily
+                              weight:weight
                            withScale:scaleMultiplier
     ];
 }
@@ -233,12 +236,13 @@ static inline CGFloat CGFloatValueFrom(NSNumber * _Nullable num) {
  */
 - (UIFont * _Nullable)UIFontFromUserSpecs:(NSNumber*)fontSize
                                fontFamily:(NSString*)fontFamily
+                               weight:(NSString*)weight
                                 withScale:(CGFloat)scaleMultiplier
 {
   return [RCTFont updateFont:nil
                   withFamily:fontFamily
                         size:fontSize
-                      weight:nil
+                      weight:weight
                        style:nil
                      variant:nil
              scaleMultiplier:scaleMultiplier];
