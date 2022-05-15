@@ -16,5 +16,6 @@
                 fontSize:(NSNumber*)fontSize
          usePreciseWidth:(BOOL)usePreciseWidth
         allowFontScaling:(BOOL)allowFontScaling
-              fontFamily:(NSString*)fontFamily;
+              fontFamily:(NSString*)fontFamily
+                  weight:(NSString*)weight;
 @end
