@@ -23,6 +23,7 @@ export interface MeasureParams {
   allowFontScaling?: boolean;
   usePreciseWidth?: boolean;
   fontFamily?: string;
+  weight?: TextProps['fontWeight']
 }
 
 export interface MeasureTextResult {
