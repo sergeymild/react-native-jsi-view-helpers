@@ -169,6 +169,7 @@ public class JsiViewHelpers {
   private double[] measureText(
     String t,
     @Nullable String fontFamily,
+    @Nullable String weight,
     double fontSize,
     double maxWidth,
     boolean usePreciseWidth,
@@ -178,6 +179,7 @@ public class JsiViewHelpers {
     WritableMap specs = Arguments.createMap();
     specs.putString("text", t);
     specs.putString("fontFamily", fontFamily);
+    specs.putString("fontWeight", weight);
     specs.putDouble("fontSize", fontSize);
     specs.putDouble("width", maxWidth);
     specs.putBoolean("usePreciseWidth", usePreciseWidth);
