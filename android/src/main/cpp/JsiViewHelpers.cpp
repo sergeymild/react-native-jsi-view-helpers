@@ -45,6 +45,7 @@ void JsiViewHelpers::installJSIBindings() {
                 __android_log_print(ANDROID_LOG_VERBOSE,"😇", "measureText");
 
                 jni::local_ref<jstring> fontFamily = nullptr;
+                jni::local_ref<jstring> fontWeight = nullptr;
                 auto allowFontScaling = true;
                 auto usePreciseWidth = false;
 
@@ -59,6 +60,14 @@ void JsiViewHelpers::installJSIBindings() {
                             .asString(runtime)
                             .utf8(runtime);
                     fontFamily = jni::make_jstring(rawFontFamily);
+                }
+
+                if (params.hasProperty(runtime, "weight")) {
+                    std::string rawWeight = params
+                            .getProperty(runtime, "weight")
+                            .asString(runtime)
+                            .utf8(runtime);
+                    fontWeight = jni::make_jstring(rawWeight);
                 }
 
                 if (params.hasProperty(runtime, "allowFontScaling")) {
@@ -81,10 +90,10 @@ void JsiViewHelpers::installJSIBindings() {
 
                 auto text = jni::make_jstring(rawString);
 
-                auto method = javaPart_->getClass()->getMethod<jni::JArrayDouble(jni::local_ref<JString>, jni::local_ref<JString>, jdouble, jdouble, jboolean, jboolean)>("measureText");
+                auto method = javaPart_->getClass()->getMethod<jni::JArrayDouble(jni::local_ref<JString>, jni::local_ref<JString>, jni::local_ref<JString>, jdouble, jdouble, jboolean, jboolean)>("measureText");
 
 
-                auto jarray1 = method(javaPart_.get(), text, fontFamily, fontSize, width, usePreciseWidth, allowFontScaling);
+                auto jarray1 = method(javaPart_.get(), text, fontFamily, fontWeight, fontSize, width, usePreciseWidth, allowFontScaling);
                 auto a = jarray1->pin();
                 // {height, width, lineCount, lastLineWidth}
 
