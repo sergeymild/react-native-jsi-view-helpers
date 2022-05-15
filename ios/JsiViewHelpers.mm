@@ -80,6 +80,12 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
                 auto rawFontFamily = params.getProperty(runtime, "fontFamily").asString(runtime).utf8(runtime);
                 fontFamily = [NSString stringWithUTF8String:rawFontFamily.c_str()];
             }
+        
+            NSString *weight = nil;
+            if (params.hasProperty(runtime, "weight")) {
+                auto rawWeight = params.getProperty(runtime, "weight").asString(runtime).utf8(runtime);
+                weight = [NSString stringWithUTF8String:rawWeight.c_str()];
+            }
             
             auto text = [NSString stringWithUTF8String:rawText.c_str()];
 
@@ -88,7 +94,8 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
                                       fontSize:[[NSNumber alloc] initWithDouble:fontSize]
                                usePreciseWidth:usePreciseWidth
                               allowFontScaling:allowFontScaling
-                                    fontFamily:fontFamily];
+                                    fontFamily:fontFamily
+                                        weight:weight];
             
             return convertNSDictionaryToJSIObject(runtime, result);
         });
