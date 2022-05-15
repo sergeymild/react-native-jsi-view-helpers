@@ -1,5 +1,5 @@
 import type React from 'react';
-import { findNodeHandle, NativeModules, Platform } from 'react-native';
+import { findNodeHandle, NativeModules, Platform, TextStyle } from 'react-native';
 
 const LINKING_ERROR =
   `The package 'react-native-jsi-view-helpers' doesn't seem to be linked. Make sure: \n\n` +
@@ -27,6 +27,7 @@ export interface MeasureParams {
   allowFontScaling?: boolean;
   usePreciseWidth?: boolean;
   fontFamily?: string;
+  weight?: TextStyle['fontWeight']
 }
 
 export interface MeasureTextResult {
