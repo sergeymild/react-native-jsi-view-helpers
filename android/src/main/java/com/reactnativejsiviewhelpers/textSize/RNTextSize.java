@@ -4,8 +4,6 @@ import android.content.Context;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.BoringLayout;
 import android.text.Layout;
 import android.text.SpannableString;
@@ -15,20 +13,9 @@ import android.view.View;
 import android.view.ViewParent;
 
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.DisplayMetricsHolder;
-import com.facebook.react.uimanager.IllegalViewOperationException;
-import com.facebook.react.uimanager.NativeViewHierarchyManager;
-import com.facebook.react.uimanager.PixelUtil;
-import com.facebook.react.uimanager.RootViewUtil;
-import com.facebook.react.uimanager.UIImplementation;
-import com.facebook.react.uimanager.UIManagerModule;
-import com.facebook.react.uimanager.UIViewOperationQueue;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import javax.annotation.Nullable;
 
@@ -39,100 +26,6 @@ public class RNTextSize {
   private static final float SPACING_MULTIPLIER = 1f;
 
   public static Context mReactContext;
-  @Nullable
-  private static NativeViewHierarchyManager nativeViewHierarchyManager;
-
-  public static double[] measure(View view) {
-    View rootView = (View) RootViewUtil.getRootView(view);
-    if (rootView == null) {
-      double[] result = new double[6];
-      result[0] = -1234567;
-      return result;
-    }
-
-    int[] buffer = new int[4];
-    computeBoundingBox(rootView, buffer);
-    int rootX = buffer[0];
-    int rootY = buffer[1];
-    computeBoundingBox(view, buffer);
-    buffer[0] -= rootX;
-    buffer[1] -= rootY;
-
-    double[] result = new double[6];
-    result[0] = result[1] = 0;
-    for (int i = 2; i < 6; ++i) result[i] = PixelUtil.toDIPFromPixel(buffer[i - 2]);
-
-    return result;
-  }
-
-  private static void computeBoundingBox(View view, int[] outputBuffer) {
-    RectF boundingBox = new RectF();
-    boundingBox.set(0, 0, view.getWidth(), view.getHeight());
-    mapRectFromViewToWindowCoords(view, boundingBox);
-
-    outputBuffer[0] = Math.round(boundingBox.left);
-    outputBuffer[1] = Math.round(boundingBox.top);
-    outputBuffer[2] = Math.round(boundingBox.right - boundingBox.left);
-    outputBuffer[3] = Math.round(boundingBox.bottom - boundingBox.top);
-  }
-
-  private static void mapRectFromViewToWindowCoords(View view, RectF rect) {
-    Matrix matrix = view.getMatrix();
-    if (!matrix.isIdentity()) {
-      matrix.mapRect(rect);
-    }
-
-    rect.offset(view.getLeft(), view.getTop());
-
-    ViewParent parent = view.getParent();
-    while (parent instanceof View) {
-      View parentView = (View) parent;
-
-      rect.offset(-parentView.getScrollX(), -parentView.getScrollY());
-
-      matrix = parentView.getMatrix();
-      if (!matrix.isIdentity()) {
-        matrix.mapRect(rect);
-      }
-
-      rect.offset(parentView.getLeft(), parentView.getTop());
-
-      parent = parentView.getParent();
-    }
-  }
-
-  public static double[] measureView(double rawViewId) {
-    int viewId = (int) rawViewId;
-
-    final double[][] measure = new double[1][1];
-
-    try {
-      if (nativeViewHierarchyManager == null) {
-        UIManagerModule uiManager = ((ReactApplicationContext) mReactContext).getNativeModule(UIManagerModule.class);
-        Class<? extends UIImplementation> aClass = uiManager.getUIImplementation().getClass();
-        Method getUIViewOperationQueue = aClass.getDeclaredMethod("getUIViewOperationQueue");
-        getUIViewOperationQueue.setAccessible(true);
-        UIViewOperationQueue queue = (UIViewOperationQueue) getUIViewOperationQueue.invoke(uiManager.getUIImplementation());
-
-        Method nativeViewHierarchyManagerMethod = queue.getClass().getDeclaredMethod("getNativeViewHierarchyManager");
-        nativeViewHierarchyManagerMethod.setAccessible(true);
-        nativeViewHierarchyManager = (NativeViewHierarchyManager) nativeViewHierarchyManagerMethod.invoke(queue);
-      }
-
-      View view = nativeViewHierarchyManager.resolveView(viewId);;
-      if (view != null) {
-        measure[0] = measure(view);
-      }
-    } catch (IllegalViewOperationException | NoSuchMethodException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (InvocationTargetException e) {
-      e.printStackTrace();
-    }
-
-    return measure[0];
-  }
 
   /**
    * Based on ReactTextShadowNode.java

@@ -3,6 +3,8 @@ package com.reactnativejsiviewhelpers;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.BoringLayout;
 import android.text.Layout;
 import android.text.SpannableString;
@@ -19,31 +21,26 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.JavaScriptContextHolder;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.UIManager;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.turbomodule.core.CallInvokerHolderImpl;
 import com.facebook.react.turbomodule.core.interfaces.CallInvokerHolder;
 import com.facebook.react.uimanager.DisplayMetricsHolder;
 import com.facebook.react.uimanager.IllegalViewOperationException;
-import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.RootViewUtil;
-import com.facebook.react.uimanager.UIImplementation;
-import com.facebook.react.uimanager.UIManagerModule;
-import com.facebook.react.uimanager.UIViewOperationQueue;
+import com.facebook.react.uimanager.UIManagerHelper;
 import com.reactnativejsiviewhelpers.textSize.RNTextSizeConf;
 import com.reactnativejsiviewhelpers.textSize.RNTextSizeSpannedText;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("JavaJniMissingFunction")
 public class JsiViewHelpers {
   private static final float SPACING_ADDITION = 0f;
   private static final float SPACING_MULTIPLIER = 1f;
   private final ReactApplicationContext context;
-
-  @Nullable
-  private NativeViewHierarchyManager nativeViewHierarchyManager;
 
   @DoNotStrip
   @SuppressWarnings("unused")
@@ -135,30 +132,18 @@ public class JsiViewHelpers {
     final double[][] measure = new double[1][1];
 
     try {
-      if (nativeViewHierarchyManager == null) {
-        UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);
-        Class<? extends UIImplementation> uiImplementationClass = uiManager.getUIImplementation().getClass();
-
-        String name = uiImplementationClass.getName();
-        while (!name.equals("com.facebook.react.uimanager.UIImplementation") && !name.equals("java.lang.Object") && uiImplementationClass != null) {
-          uiImplementationClass = (Class<? extends UIImplementation>) uiImplementationClass.getSuperclass();
-          name = uiImplementationClass.getName();
-        }
-
-        Method getUIViewOperationQueue = uiImplementationClass.getDeclaredMethod("getUIViewOperationQueue");
-        getUIViewOperationQueue.setAccessible(true);
-        UIViewOperationQueue queue = (UIViewOperationQueue) getUIViewOperationQueue.invoke(uiManager.getUIImplementation());
-
-        Method nativeViewHierarchyManagerMethod = queue.getClass().getDeclaredMethod("getNativeViewHierarchyManager");
-        nativeViewHierarchyManagerMethod.setAccessible(true);
-        nativeViewHierarchyManager = (NativeViewHierarchyManager) nativeViewHierarchyManagerMethod.invoke(queue);
+      CountDownLatch latch = new CountDownLatch(1);
+      UIManager uiManager = UIManagerHelper.getUIManager(context, viewId);
+      final View[] view = new View[1];
+      new Handler(Looper.getMainLooper()).post(() -> {
+        view[0] = uiManager.resolveView(viewId);
+        latch.countDown();
+      });
+      latch.await(1, TimeUnit.SECONDS);
+      if (view[0] != null) {
+        measure[0] = measure(view[0]);
       }
-
-      View view = nativeViewHierarchyManager.resolveView(viewId);;
-      if (view != null) {
-        measure[0] = measure(view);
-      }
-    } catch (IllegalViewOperationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+    } catch (IllegalViewOperationException | InterruptedException e) {
       e.printStackTrace();
     }
 

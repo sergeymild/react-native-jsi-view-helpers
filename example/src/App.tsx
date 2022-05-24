@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
 
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { viewHelpers } from 'react-native-jsi-view-helpers';
 
 const text =
@@ -9,7 +9,7 @@ const text =
   'Note: Device manufacturer or custom ROM can change the default font';
 
 export default function App() {
-  const viewRef = useRef<View>(null);
+  const viewRef = useRef<TouchableOpacity>(null);
   const fs = 14;
   const w = 53;
   const h = viewHelpers.measureText({ text, fontSize: fs, maxWidth: w });
@@ -17,12 +17,6 @@ export default function App() {
     '[App.measure]',
     viewHelpers.measureText({ text, fontSize: fs, maxWidth: w })
   );
-
-  useEffect(() => {
-    setTimeout(() => {
-      console.log('[App.]', viewHelpers.measureView(viewRef));
-    }, 1000);
-  }, []);
 
   return (
     <View style={styles.container}>
@@ -36,6 +30,16 @@ export default function App() {
           backgroundColor: 'red',
         }}
       />
+
+      <TouchableOpacity
+        ref={viewRef}
+        style={{ width: 100, height: 200, backgroundColor: 'yellow' }}
+        onPress={() => {
+          console.log('[App.measure]', viewHelpers.measureView(viewRef))
+        }}
+      >
+        <Text>Measure</Text>
+      </TouchableOpacity>
     </View>
   );
 }
