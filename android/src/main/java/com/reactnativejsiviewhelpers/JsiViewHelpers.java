@@ -46,6 +46,8 @@ public class JsiViewHelpers {
   @SuppressWarnings("unused")
   HybridData mHybridData;
 
+  private Handler handler = new Handler(Looper.getMainLooper());
+
   public native HybridData initHybrid(long jsContext, CallInvokerHolderImpl jsCallInvokerHolder);
   public native void installJSIBindings();
 
@@ -135,7 +137,7 @@ public class JsiViewHelpers {
       CountDownLatch latch = new CountDownLatch(1);
       UIManager uiManager = UIManagerHelper.getUIManager(context, viewId);
       final View[] view = new View[1];
-      new Handler(Looper.getMainLooper()).post(() -> {
+      handler.post(() -> {
         view[0] = uiManager.resolveView(viewId);
         latch.countDown();
       });
