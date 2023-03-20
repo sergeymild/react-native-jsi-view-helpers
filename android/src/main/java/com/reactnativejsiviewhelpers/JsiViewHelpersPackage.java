@@ -17,6 +17,7 @@ public class JsiViewHelpersPackage implements ReactPackage {
     public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
         modules.add(new JsiViewHelpersModule(reactContext));
+        modules.add(new AndroidAppState(reactContext));
         return modules;
     }
 

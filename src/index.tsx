@@ -1,6 +1,8 @@
 import type React from 'react';
 import { findNodeHandle, NativeModules, Platform, TextStyle } from 'react-native';
 
+export {subscribeOnAppState} from './useAppState'
+
 const LINKING_ERROR =
   `The package 'react-native-jsi-view-helpers' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +

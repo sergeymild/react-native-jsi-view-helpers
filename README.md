@@ -6,7 +6,7 @@ React Native Jsi view helpers
 
 ```sh
 package.json
-"react-native-jsi-view-helpers": "sergeymild/react-native-jsi-view-helpers#0.71.1"
+"react-native-jsi-view-helpers": "sergeymild/react-native-jsi-view-helpers#0.71.2"
 yarn
 npx pod-install
 ```

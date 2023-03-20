@@ -11,12 +11,16 @@ buildscript {
     }
   }
 
+  def kotlin_version = rootProject.ext.has("kotlinVersion") ? rootProject.ext.get("kotlinVersion") : project.properties["Sheet_kotlinVersion"]
+
   dependencies {
-    classpath 'com.android.tools.build:gradle:4.2.2'
+    classpath "com.android.tools.build:gradle:7.2.1"
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
   }
 }
 
 apply plugin: 'com.android.library'
+apply plugin: "kotlin-android"
 
 def getExtOrDefault(name) {
   return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['JsiViewHelper_' + name]
@@ -138,7 +142,11 @@ repositories {
   google()
 }
 
+def kotlin_version = getExtOrDefault("kotlinVersion")
 
 dependencies {
   implementation "com.facebook.react:react-android"
+  implementation "androidx.lifecycle:lifecycle-common:2.6.0"
+  implementation "androidx.lifecycle:lifecycle-process:2.6.0"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
