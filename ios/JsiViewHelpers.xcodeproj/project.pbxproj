@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5E555C0D2413F4C50049A1A2 /* JsiViewHelpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* JsiViewHelpers.mm */; };
+		8DE712092A779AE8007E785A /* RNTextSize.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DE712082A779AE8007E785A /* RNTextSize.m */; };
+		8DE7120C2A77A2E2007E785A /* Scroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE7120B2A77A2E2007E785A /* Scroller.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,6 +25,10 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libJsiViewHelpers.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libJsiViewHelpers.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		8DE712072A779AE8007E785A /* RNTextSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNTextSize.h; sourceTree = "<group>"; };
+		8DE712082A779AE8007E785A /* RNTextSize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNTextSize.m; sourceTree = "<group>"; };
+		8DE7120A2A77A2E2007E785A /* JsiViewHelpers-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "JsiViewHelpers-Bridging-Header.h"; sourceTree = "<group>"; };
+		8DE7120B2A77A2E2007E785A /* Scroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scroller.swift; sourceTree = "<group>"; };
 		B3E7B5881CC2AC0600A0062D /* JsiViewHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JsiViewHelpers.h; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* JsiViewHelpers.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JsiViewHelpers.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -50,9 +55,13 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				8DE7120B2A77A2E2007E785A /* Scroller.swift */,
 				B3E7B5881CC2AC0600A0062D /* JsiViewHelpers.h */,
 				B3E7B5891CC2AC0600A0062D /* JsiViewHelpers.mm */,
+				8DE712072A779AE8007E785A /* RNTextSize.h */,
+				8DE712082A779AE8007E785A /* RNTextSize.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
+				8DE7120A2A77A2E2007E785A /* JsiViewHelpers-Bridging-Header.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -87,6 +96,7 @@
 				TargetAttributes = {
 					58B511DA1A9E6C8500147676 = {
 						CreatedOnToolsVersion = 6.1.1;
+						LastSwiftMigration = 1430;
 					};
 				};
 			};
@@ -113,7 +123,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B3E7B58A1CC2AC0600A0062D /* JsiViewHelpers.mm in Sources */,
+				8DE712092A779AE8007E785A /* RNTextSize.m in Sources */,
+				8DE7120C2A77A2E2007E785A /* Scroller.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -218,6 +229,7 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -228,12 +240,16 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = JsiViewHelpers;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "JsiViewHelpers-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -244,6 +260,8 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = JsiViewHelpers;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "JsiViewHelpers-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
