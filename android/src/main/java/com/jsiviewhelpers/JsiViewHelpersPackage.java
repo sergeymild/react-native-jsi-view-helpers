@@ -1,5 +1,4 @@
 package com.jsiviewhelpers;
-
 import androidx.annotation.NonNull;
 
 import com.facebook.react.ReactPackage;

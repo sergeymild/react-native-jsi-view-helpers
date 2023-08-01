@@ -8,12 +8,22 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.module.annotations.ReactModule;
 
+
+import androidx.annotation.NonNull;
+
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.module.annotations.ReactModule;
+
 @ReactModule(name = JsiViewHelpersModule.NAME)
 public class JsiViewHelpersModule extends ReactContextBaseJavaModule {
   public static final String NAME = "JsiViewHelpers";
+  private final JsiViewHelpers jsiViewHelpers;
 
   public JsiViewHelpersModule(ReactApplicationContext reactContext) {
     super(reactContext);
+    jsiViewHelpers = new JsiViewHelpers(reactContext);
   }
 
   @Override
@@ -22,11 +32,9 @@ public class JsiViewHelpersModule extends ReactContextBaseJavaModule {
     return NAME;
   }
 
-
-  // Example method
-  // See https://reactnative.dev/docs/native-modules-android
-  @ReactMethod
-  public void multiply(double a, double b, Promise promise) {
-    promise.resolve(a * b);
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public void install() {
+    jsiViewHelpers.install();
   }
 }
+

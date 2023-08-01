@@ -80,13 +80,13 @@ export class viewHelpers {
   ) {
     // @ts-ignore
     return global.__viewHelpers.scrollToChild({
-      scrollView:
+      scrollNativeID:
         'scrollNativeID' in params ? params.scrollNativeID : undefined,
       scrollViewId:
         'scrollViewRef' in params
           ? findNodeHandle(params.scrollViewRef.current)
           : undefined,
-      child: params.childNativeID,
+      childNativeID: params.childNativeID,
       offset: params.offset ?? 0,
       scrollToEnd: params.scrollToEnd ?? false,
     });
