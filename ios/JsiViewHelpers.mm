@@ -151,12 +151,12 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
         
         
         auto params = args[0].asObject(runtime);
-        auto childId = params.getProperty(runtime, "child").asString(runtime).utf8(runtime);
+        auto childId = params.getProperty(runtime, "childNativeID").asString(runtime).utf8(runtime);
         auto offset = params.getProperty(runtime, "offset").asNumber();
         auto scrollToEnd = params.getProperty(runtime, "scrollToEnd").getBool();
         
         auto scrollId = params.getProperty(runtime, "scrollViewId");
-        auto scrollNativeId = params.getProperty(runtime, "scrollView");
+        auto scrollNativeId = params.getProperty(runtime, "scrollNativeID");
         NSNumber* refScrollId;
         NSString* nativeScrollId;
         NSString* nativeChildId = [[NSString alloc] initWithCString:childId.c_str() encoding:NSUTF8StringEncoding];
