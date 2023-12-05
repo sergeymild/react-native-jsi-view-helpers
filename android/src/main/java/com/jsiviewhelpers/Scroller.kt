@@ -9,6 +9,7 @@ import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.util.ReactFindViewUtil
 import com.facebook.react.views.scroll.ReactHorizontalScrollView
 import com.facebook.react.views.scroll.ReactScrollView
+import com.facebook.react.views.swiperefresh.ReactSwipeRefreshLayout
 
 object Scroller {
     fun findView(context: ReactContext?, viewId: Int): View? {
