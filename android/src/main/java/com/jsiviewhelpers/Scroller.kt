@@ -44,6 +44,9 @@ object Scroller {
             if (scrollView == null) return@runOnUiThread
             val childView = ReactFindViewUtil.findView(scrollView, childNativeID)
                     ?: return@runOnUiThread
+            if (scrollView is ReactSwipeRefreshLayout) {
+              scrollView = scrollView.getChildAt(0)
+            }
             if (scrollView is ReactScrollView) {
               scrollView.scrollTo(childView, scrollToEnd, offset.toInt())
             } else if (scrollView is ReactHorizontalScrollView) {
