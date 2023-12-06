@@ -1,6 +1,6 @@
 {
   "name": "react-native-jsi-view-helpers",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "React Native Jsi view helpers",
   "main": "src/index",
   "module": "src/index",

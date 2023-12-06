@@ -68,7 +68,7 @@ fun ScrollView.scrollTo(
   offsetDescendantRectToMyCoords(child, myViewRect)
   val scrollDelta: Int = this.scrollDeltaToGetChildRectOnScreen(myViewRect, scrollToChildBottom, offset)
   if (scrollDelta != 0) {
-    scrollBy(0, scrollDelta)
+    smoothScrollBy(0, scrollDelta)
   }
 }
 
@@ -83,7 +83,7 @@ fun ReactHorizontalScrollView.scrollTo(
   offsetDescendantRectToMyCoords(child, myViewRect)
   val scrollDelta: Int = this.scrollDeltaToGetChildRectOnScreen(myViewRect, scrollToChildBottom, offset)
   if (scrollDelta != 0) {
-    scrollBy(scrollDelta, 0)
+    smoothScrollBy(scrollDelta, 0)
   }
 }
 
