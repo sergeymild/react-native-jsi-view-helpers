@@ -5,9 +5,18 @@
 #import <React/RCTBridge+Private.h>
 #import <jsi/jsi.h>
 #import "RNTextSize.h"
-#import "react_native_jsi_view_helpers-Swift.h"
+#import "Scroller.h"
 
 using namespace facebook;
+
+@interface JsiViewHelpers()
+
+jsi::String convertNSStringToJSIString(jsi::Runtime &runtime, NSString *value);
+jsi::Value convertNSNumberToJSINumber(jsi::Runtime &runtime, NSNumber *value);
+jsi::Value convertObjCObjectToJSIValue(jsi::Runtime &runtime, id value);
+jsi::Object convertNSDictionaryToJSIObject(jsi::Runtime &runtime, NSDictionary *value);
+
+@end
 
 @implementation JsiViewHelpers
 
@@ -174,22 +183,17 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
                 foundScrollView = (RCTScrollView*)view;
             } else if (nativeScrollId != NULL) {
                 UIView* parent = UIApplication.sharedApplication.keyWindow.rootViewController.view;
-                UIView* view = [Scroller findInParentWithParent:parent
-                                                       nativeID:nativeScrollId
-                ];
+                UIView* view = [Scroller findInParent:parent nativeID:nativeScrollId];
                 foundScrollView = (RCTScrollView*)view;
             }
             
             if (foundScrollView == NULL) return;
-            UIView* childView = [Scroller findInParentWithParent:foundScrollView
-                                    nativeID:nativeChildId
-            ];
-            [Scroller scrollToViewWithScrollView:foundScrollView
-                                            view:childView
-                                          offset:CGFloat(offset)
-                                     scrollToEnd:scrollToEnd
-                                        animated:true
-            ];
+            UIView* childView = [Scroller findInParent:foundScrollView nativeID:nativeChildId];
+            [Scroller scrollToView:foundScrollView.scrollView
+                              view:childView
+                            offset:CGFloat(offset)
+                       scrollToEnd:scrollToEnd
+                          animated:true];
         });
         
         return jsi::Value::undefined();

@@ -1,6 +1,6 @@
 {
   "name": "react-native-jsi-view-helpers",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "React Native Jsi view helpers",
   "main": "src/index",
   "module": "src/index",
@@ -51,11 +51,10 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "pod-install": "^0.1.0",
-    "prettier": "^2.0.5",
+    "prettier": "2.8.8",
     "react": "18.2.0",
     "react-native": "0.72.3",
-    "turbo": "^1.10.7",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.4"
   },
   "resolutions": {
     "@types/react": "17.0.21"
@@ -64,11 +63,6 @@
     "react": "*",
     "react-native": "*"
   },
-  "engines": {
-    "node": ">= 16.0.0"
-  },
-  "packageManager": "^yarn@1.22.15",
-
 
   "eslintConfig": {
     "root": true,
