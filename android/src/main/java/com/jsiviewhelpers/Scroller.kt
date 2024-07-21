@@ -43,7 +43,7 @@ object Scroller {
                 scrollView = findView(context, scrollViewId.toInt())
             }
             if (scrollView == null) return@runOnUiThread
-            val childView = ReactFindViewUtil.findView(scrollView, childNativeID ?: ")
+            val childView = ReactFindViewUtil.findView(scrollView, childNativeID ?: "")
                     ?: return@runOnUiThread
             if (scrollView is ReactSwipeRefreshLayout) {
               scrollView = scrollView.getChildAt(0)
