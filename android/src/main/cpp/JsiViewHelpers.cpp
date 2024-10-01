@@ -131,6 +131,31 @@ void JsiViewHelpers::installJSIBindings() {
                 return result;
             });
 
+
+    auto measureViewByNativeId = jsi::Function::createFromHostFunction(
+            *runtime_,
+            jsi::PropNameID::forUtf8(*runtime_, "measureViewByNativeId"),
+            1,
+            [=](jsi::Runtime &runtime,
+                const jsi::Value &thisArg,
+                const jsi::Value *args,
+                size_t count) -> jsi::Value {
+                auto result = jsi::Object(runtime);
+
+                auto method = javaPart_->getClass()->getMethod<jni::JArrayDouble(jni::local_ref<JString>)>("measureViewByNativeId");
+                jni::local_ref<jstring> nativeID = jni::make_jstring(args[0].asString(runtime).utf8(runtime));;
+                auto jarray1 = method(javaPart_.get(), nativeID);
+                auto a = jarray1->pin();
+
+                result.setProperty(runtime, "x", (double)a[2]);
+                result.setProperty(runtime, "y", (double)a[3]);
+                result.setProperty(runtime, "width", (double)a[4]);
+                result.setProperty(runtime, "height", (double)a[5]);
+
+                a.release();
+                return result;
+            });
+
     auto scrollToChild = jsi::Function::createFromHostFunction(
             *runtime_,
             jsi::PropNameID::forUtf8(*runtime_, "scrollToChild"),
@@ -185,6 +210,7 @@ void JsiViewHelpers::installJSIBindings() {
 
     jsi::Object viewHelpers = jsi::Object(*runtime_);
     viewHelpers.setProperty(*runtime_, "measureView", std::move(measureView));
+    viewHelpers.setProperty(*runtime_, "measureViewByNativeId", std::move(measureViewByNativeId));
     viewHelpers.setProperty(*runtime_, "measureText", std::move(measureText));
     viewHelpers.setProperty(*runtime_, "scrollToChild", std::move(scrollToChild));
     runtime_->global().setProperty(*runtime_, "__viewHelpers", std::move(viewHelpers));

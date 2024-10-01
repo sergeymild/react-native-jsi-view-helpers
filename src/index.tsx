@@ -63,6 +63,11 @@ export class viewHelpers {
     return global.__viewHelpers.measureView(viewId);
   }
 
+  static measureViewByNativeId(nativeID: string): MeasureViewResult {
+    // @ts-ignore
+    return global.__viewHelpers.measureViewByNativeId(nativeID);
+  }
+
   static scrollToChild(
     params:
       | {

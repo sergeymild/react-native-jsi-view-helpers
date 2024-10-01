@@ -31,6 +31,7 @@ import com.facebook.react.uimanager.IllegalViewOperationException;
 import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.RootViewUtil;
 import com.facebook.react.uimanager.UIManagerHelper;
+import com.facebook.react.uimanager.util.ReactFindViewUtil;
 import com.jsiviewhelpers.textSize.RNTextSizeConf;
 import com.jsiviewhelpers.textSize.RNTextSizeSpannedText;
 
@@ -149,6 +150,7 @@ public class JsiViewHelpers {
 
     try {
       CountDownLatch latch = new CountDownLatch(1);
+      //ReactFindViewUtil.findView(context.getCurrentActivity().getWindow().getDecorView(), "")
       UIManager uiManager = UIManagerHelper.getUIManager(context, viewId);
       final View[] view = new View[1];
       handler.post(() -> {
@@ -164,6 +166,17 @@ public class JsiViewHelpers {
     }
 
     return measure[0];
+  }
+
+  @DoNotStrip
+  private double[] measureViewByNativeId(String nativeID) {
+    try {
+      View view = ReactFindViewUtil.findView(context.getCurrentActivity().getWindow().getDecorView(), nativeID);
+      return measure(view);
+    } catch (IllegalViewOperationException e) {
+      e.printStackTrace();
+    }
+    return new double[]{};
   }
 
   @DoNotStrip
