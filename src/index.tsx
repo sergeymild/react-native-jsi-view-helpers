@@ -1,30 +1,19 @@
 import type React from 'react';
-import {
-  findNodeHandle,
-  NativeModules,
-  Platform,
-  ScrollView,
-  TextStyle,
-} from 'react-native';
+import { findNodeHandle, ScrollView } from 'react-native';
 
-const LINKING_ERROR =
-  `The package 'react-native-jsi-view-helpers' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo managed workflow\n';
+import JsiViewHelpers from './NativeJsiViewHelpers';
 
-const JsiViewHelpers = NativeModules.JsiViewHelpers
-  ? NativeModules.JsiViewHelpers
-  : new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      }
-    );
-
-JsiViewHelpers.install();
+type FontWeight =
+  | 'bold'
+  | '100'
+  | '200'
+  | '300'
+  | '400'
+  | '500'
+  | '600'
+  | '700'
+  | '800'
+  | '900';
 
 export interface MeasureParams {
   text: string;
@@ -33,7 +22,7 @@ export interface MeasureParams {
   allowFontScaling?: boolean;
   usePreciseWidth?: boolean;
   fontFamily?: string;
-  weight?: TextStyle['fontWeight'];
+  weight?: FontWeight;
 }
 
 export interface MeasureTextResult {
@@ -52,20 +41,17 @@ export interface MeasureViewResult {
 
 export class viewHelpers {
   static measureText(params: MeasureParams): MeasureTextResult {
-    // @ts-ignore
-    return global.__viewHelpers.measureText(params);
+    return JsiViewHelpers.measureText(params);
   }
 
   static measureView(ref: React.RefObject<any>): MeasureViewResult {
     const viewId = findNodeHandle(ref.current);
     if (!viewId) return { width: 0, height: 0, x: 0, y: 0 };
-    // @ts-ignore
-    return global.__viewHelpers.measureView(viewId);
+    return JsiViewHelpers.measureView(viewId);
   }
 
   static measureViewByNativeId(nativeID: string): MeasureViewResult {
-    // @ts-ignore
-    return global.__viewHelpers.measureViewByNativeId(nativeID);
+    return JsiViewHelpers.measureViewByNativeId(nativeID);
   }
 
   static scrollToChild(
@@ -83,13 +69,12 @@ export class viewHelpers {
           scrollToEnd?: boolean;
         }
   ) {
-    // @ts-ignore
-    return global.__viewHelpers.scrollToChild({
+    return JsiViewHelpers.scrollToChild({
       scrollNativeID:
         'scrollNativeID' in params ? params.scrollNativeID : undefined,
       scrollViewId:
         'scrollViewRef' in params
-          ? findNodeHandle(params.scrollViewRef.current)
+          ? (findNodeHandle(params.scrollViewRef.current) ?? undefined)
           : undefined,
       childNativeID: params.childNativeID,
       offset: params.offset ?? 0,

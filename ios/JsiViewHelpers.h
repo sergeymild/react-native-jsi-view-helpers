@@ -1,5 +1,10 @@
-#import <React/RCTBridgeModule.h>
 
-@interface JsiViewHelpers : NSObject <RCTBridgeModule>
+
+
+#import "JsiViewHelpersSpec.h"
+
+@interface JsiViewHelpers : NSObject <NativeJsiViewHelpersSpec>
+
+
 
 @end

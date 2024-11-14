@@ -1,5 +1,7 @@
 buildscript {
-  def kotlin_version = rootProject.ext.has("kotlinVersion") ? rootProject.ext.get("kotlinVersion") : project.properties["JsiViewHelpers_kotlinVersion"]
+  // Buildscript is evaluated before everything else so we can't use getExtOrDefault
+  def kotlin_version = rootProject.ext.has("kotlinVersion") ? rootProject.ext.get("kotlinVersion") : project.properties["MediaLibrary_kotlinVersion"]
+
   repositories {
     google()
     mavenCentral()
@@ -7,8 +9,14 @@ buildscript {
 
   dependencies {
     classpath "com.android.tools.build:gradle:7.2.1"
+    // noinspection DifferentKotlinGradleVersion
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
   }
+}
+
+def reactNativeArchitectures() {
+  def value = rootProject.getProperties().get("reactNativeArchitectures")
+  return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
 def isNewArchitectureEnabled() {
@@ -18,18 +26,16 @@ def isNewArchitectureEnabled() {
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
-def appProject = rootProject.allprojects.find { it.plugins.hasPlugin('com.android.application') }
-
 if (isNewArchitectureEnabled()) {
   apply plugin: "com.facebook.react"
 }
 
 def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["JsiViewHelpers_" + name]
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["MediaLibrary_" + name]
 }
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["JsiViewHelpers_" + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["MediaLibrary_" + name]).toInteger()
 }
 
 def supportsNamespace() {
@@ -38,117 +44,31 @@ def supportsNamespace() {
   def minor = parsed[1].toInteger()
 
   // Namespace support was added in 7.3.0
-  if (major == 7 && minor >= 3) {
-    return true
-  }
-
-  return major >= 8
+  return (major == 7 && minor >= 3) || major >= 8
 }
-
-
-//----------------------
-def safeExtGet(prop, fallback) {
-  rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
-}
-
-def reactNativeArchitectures() {
-  def value = project.getProperties().get("reactNativeArchitectures")
-  return value ? value.split(",") : ["armeabi-v7a", "arm64-v8a"]
-}
-
-def resolveReactNativeDirectory() {
-  def reactNativeLocation = safeExtGet("REACT_NATIVE_NODE_MODULES_DIR", null)
-  if (reactNativeLocation != null) {
-    return file(reactNativeLocation)
-  }
-
-  // monorepo workaround
-  // react-native can be hoisted or in project's own node_modules
-  def reactNativeFromProjectNodeModules = file("${rootProject.projectDir}/../node_modules/react-native")
-  if (reactNativeFromProjectNodeModules.exists()) {
-    return reactNativeFromProjectNodeModules
-  }
-
-  throw new GradleException(
-    "[Reanimated] Unable to resolve react-native location in " +
-      "node_modules. You should project extension property (in app/build.gradle) " +
-      "`REACT_NATIVE_NODE_MODULES_DIR` with path to react-native."
-  )
-}
-
-def reactNativeRootDir = resolveReactNativeDirectory()
-//----------------------
 
 android {
-  buildFeatures {
-    prefab true
-  }
-
   if (supportsNamespace()) {
-    namespace "com.jsiviewhelpers"
-  } else {
+    namespace "com.medialibrary"
+
     sourceSets {
       main {
-        manifest.srcFile "src/main/AndroidManifestDeprecated.xml"
+        manifest.srcFile "src/main/AndroidManifestNew.xml"
       }
     }
   }
 
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
-  ndkVersion getExtOrDefault('ndkVersion')
 
   defaultConfig {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-    externalNativeBuild {
-      cmake {
-        cppFlags "-fexceptions", "-frtti", "-std=c++1y", "-DONANDROID"
-        abiFilters "armeabi-v7a", "arm64-v8a"
-        arguments '-DANDROID_STL=c++_shared',
-          "-DREACT_NATIVE_DIR=${reactNativeRootDir.path}",
-          "-DANDROID_CPP_FEATURES=rtti exceptions",
-          '-DANDROID_ARM_NEON=TRUE'
-      }
-    }
-    ndk {
-      abiFilters (*reactNativeArchitectures())
-    }
+
   }
 
-  externalNativeBuild {
-    cmake {
-      path "CMakeLists.txt"
-    }
-  }
-
-
-  packagingOptions {
-    // Exclude all Libraries that are already present in the user's app (through React Native or by him installing REA)
-    excludes = [
-      "META-INF",
-      "META-INF/**",
-      "**/libc++_shared.so",
-      "**/libfbjni.so",
-      "**/libjsi.so",
-      "**/libfolly_json.so",
-      "**/libfolly_runtime.so",
-      "**/libglog.so",
-      "**/libhermes.so",
-      "**/libhermes-executor-debug.so",
-      "**/libhermes_executor.so",
-      "**/libreactnativejni.so",
-      "**/libturbomodulejsijni.so",
-      "**/libreact_nativemodule_core.so",
-      "**/libjscexecutor.so",
-      "**/libv8executor.so",
-    ]
-    exclude "META-INF/**"
-  }
-
-  configurations {
-    extractHeaders
-    extractJNI
+  buildFeatures {
+    buildConfig true
   }
 
   buildTypes {
@@ -166,6 +86,16 @@ android {
     targetCompatibility JavaVersion.VERSION_1_8
   }
 
+  sourceSets {
+    main {
+      if (isNewArchitectureEnabled()) {
+          java.srcDirs += [
+            "generated/java",
+            "generated/jni"
+          ]
+      }
+    }
+  }
 }
 
 repositories {
@@ -174,12 +104,14 @@ repositories {
 }
 
 def kotlin_version = getExtOrDefault("kotlinVersion")
+
 dependencies {
   // For < 0.71, this will be from the local maven repo
   // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
   //noinspection GradleDynamicVersion
-  implementation "com.facebook.react:react-android"
+  implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  implementation "androidx.exifinterface:exifinterface:${getExtOrDefault('exifinterfaceVersion')}"
 }
 
 if (isNewArchitectureEnabled()) {

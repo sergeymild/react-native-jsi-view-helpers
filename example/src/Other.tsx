@@ -10,35 +10,54 @@ const text =
 
 export default function Other() {
   const viewRef = useRef<TouchableOpacity>(null);
-  const fs = 14;
-  const w = 53;
-  const h = viewHelpers.measureText({ text, fontSize: fs, maxWidth: w });
-  console.log(
-    '[App.measure]',
-    viewHelpers.measureText({ text, fontSize: fs, maxWidth: w })
-  );
 
   return (
-    <View style={styles.container}>
-      <Text
-        ref={viewRef}
-        children={text}
-        style={{
-          fontSize: fs,
-          height: h.height,
-          width: h.width,
-          backgroundColor: 'red',
-        }}
-      />
+    <View style={styles.container} accessibilityLabel={'baseContainer'}>
+      <Text ref={viewRef} children={text} style={{}} />
 
       <TouchableOpacity
         ref={viewRef}
         style={{ width: 100, height: 200, backgroundColor: 'yellow' }}
         onPress={() => {
-          console.log('[App.measure]', viewHelpers.measureView(viewRef))
+          console.log('[App.measure]', viewHelpers.measureView(viewRef));
         }}
       >
         <Text>Measure</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        accessibilityLabel={'withNativeId'}
+        nativeID={'someAwesomeId'}
+        ref={viewRef}
+        style={{ width: 100, height: 200, backgroundColor: 'yellow' }}
+        onPress={(event) => {
+          console.log(
+            '[App.measure]',
+            viewHelpers.measureViewByNativeId('textWithNativeId')
+          );
+        }}
+      >
+        <Text
+          nativeID={'textWithNativeId'}
+          accessibilityLabel={'textWithNativeLabel'}
+        >
+          Measure by native id
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        ref={viewRef}
+        style={{ width: 100, height: 200, backgroundColor: 'yellow' }}
+        onPress={() => {
+          const fs = 14;
+          const w = 53;
+          const h = viewHelpers.measureText({
+            text,
+            fontSize: fs,
+            maxWidth: w,
+          });
+          console.log('[App.measure]', h);
+        }}
+      >
+        <Text>Measure Text</Text>
       </TouchableOpacity>
     </View>
   );
