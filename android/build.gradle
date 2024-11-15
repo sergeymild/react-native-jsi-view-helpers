@@ -16,7 +16,7 @@ buildscript {
 
 def reactNativeArchitectures() {
   def value = rootProject.getProperties().get("reactNativeArchitectures")
-  return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
+  return value ? value.split(",") : ["armeabi-v7a", "arm64-v8a"]
 }
 
 def isNewArchitectureEnabled() {
@@ -49,7 +49,7 @@ def supportsNamespace() {
 
 android {
   if (supportsNamespace()) {
-    namespace "com.medialibrary"
+    namespace "com.jsiviewhelpers"
 
     sourceSets {
       main {
@@ -111,7 +111,6 @@ dependencies {
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation "androidx.exifinterface:exifinterface:${getExtOrDefault('exifinterfaceVersion')}"
 }
 
 if (isNewArchitectureEnabled()) {

@@ -16,16 +16,12 @@ import android.view.ViewParent;
 
 import androidx.annotation.Nullable;
 
-import com.facebook.jni.HybridData;
 import com.facebook.jni.annotations.DoNotStrip;
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.JavaScriptContextHolder;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.UIManager;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.turbomodule.core.CallInvokerHolderImpl;
-import com.facebook.react.turbomodule.core.interfaces.CallInvokerHolder;
 import com.facebook.react.uimanager.DisplayMetricsHolder;
 import com.facebook.react.uimanager.IllegalViewOperationException;
 import com.facebook.react.uimanager.PixelUtil;
@@ -35,40 +31,17 @@ import com.facebook.react.uimanager.util.ReactFindViewUtil;
 import com.jsiviewhelpers.textSize.RNTextSizeConf;
 import com.jsiviewhelpers.textSize.RNTextSizeSpannedText;
 
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-@SuppressWarnings("JavaJniMissingFunction")
 public class JsiViewHelpers {
   private static final float SPACING_ADDITION = 0f;
   private static final float SPACING_MULTIPLIER = 1f;
   private final ReactApplicationContext context;
 
-  @DoNotStrip
-  @SuppressWarnings("unused")
-  HybridData mHybridData;
-
   private Handler handler = new Handler(Looper.getMainLooper());
-
-  public native HybridData initHybrid(long jsContext, CallInvokerHolderImpl jsCallInvokerHolder);
-  public native void installJSIBindings();
-
   public JsiViewHelpers(ReactApplicationContext reactContext) {
     context = reactContext;
-
-  }
-
-  public boolean install() {
-    try {
-      System.loadLibrary("react-native-jsi-view-helpers");
-      JavaScriptContextHolder jsContext = context.getJavaScriptContextHolder();
-      CallInvokerHolder jsCallInvokerHolder = context.getCatalystInstance().getJSCallInvokerHolder();
-      mHybridData = initHybrid(jsContext.get(), (CallInvokerHolderImpl) jsCallInvokerHolder);
-      installJSIBindings();
-      return true;
-    } catch (Exception exception) {
-      return false;
-    }
   }
   @DoNotStrip
   public void scrollToChild(
@@ -84,12 +57,10 @@ public class JsiViewHelpers {
     Scroller.scrollToChild(context, currentActivity, scrollNativeID, scrollViewId, childNativeID, offset, scrollToEnd);
   }
   @DoNotStrip
-  public double[] measure(View view) {
+  public WritableMap measure(View view) {
     View rootView = (View) RootViewUtil.getRootView(view);
     if (rootView == null) {
-      double[] result = new double[6];
-      result[0] = -1234567;
-      return result;
+      return emptyMeasure();
     }
 
     int[] buffer = new int[4];
@@ -100,53 +71,19 @@ public class JsiViewHelpers {
     buffer[0] -= rootX;
     buffer[1] -= rootY;
 
-    double[] result = new double[6];
-    result[0] = result[1] = 0;
-    for (int i = 2; i < 6; ++i) result[i] = PixelUtil.toDIPFromPixel(buffer[i - 2]);
-
+    WritableMap result = Arguments.createMap();
+    result.putDouble("x", PixelUtil.toDIPFromPixel(buffer[0]));
+    result.putDouble("y", PixelUtil.toDIPFromPixel(buffer[1]));
+    result.putDouble("width", PixelUtil.toDIPFromPixel(buffer[2]));
+    result.putDouble("height", PixelUtil.toDIPFromPixel(buffer[3]));
     return result;
   }
 
-  private static void computeBoundingBox(View view, int[] outputBuffer) {
-    RectF boundingBox = new RectF();
-    boundingBox.set(0, 0, view.getWidth(), view.getHeight());
-    mapRectFromViewToWindowCoords(view, boundingBox);
-
-    outputBuffer[0] = Math.round(boundingBox.left);
-    outputBuffer[1] = Math.round(boundingBox.top);
-    outputBuffer[2] = Math.round(boundingBox.right - boundingBox.left);
-    outputBuffer[3] = Math.round(boundingBox.bottom - boundingBox.top);
-  }
-
-  private static void mapRectFromViewToWindowCoords(View view, RectF rect) {
-    Matrix matrix = view.getMatrix();
-    if (!matrix.isIdentity()) {
-      matrix.mapRect(rect);
-    }
-
-    rect.offset(view.getLeft(), view.getTop());
-
-    ViewParent parent = view.getParent();
-    while (parent instanceof View) {
-      View parentView = (View) parent;
-
-      rect.offset(-parentView.getScrollX(), -parentView.getScrollY());
-
-      matrix = parentView.getMatrix();
-      if (!matrix.isIdentity()) {
-        matrix.mapRect(rect);
-      }
-
-      rect.offset(parentView.getLeft(), parentView.getTop());
-
-      parent = parentView.getParent();
-    }
-  }
   @DoNotStrip
-  private double[] measureView(double rawViewId) {
+  WritableMap measureView(double rawViewId) {
     int viewId = (int) rawViewId;
 
-    final double[][] measure = new double[1][1];
+    WritableMap result = Arguments.createMap();
 
     try {
       CountDownLatch latch = new CountDownLatch(1);
@@ -159,28 +96,28 @@ public class JsiViewHelpers {
       });
       latch.await(1, TimeUnit.SECONDS);
       if (view[0] != null) {
-        measure[0] = measure(view[0]);
+        return measure(view[0]);
       }
     } catch (IllegalViewOperationException | InterruptedException e) {
       e.printStackTrace();
     }
 
-    return measure[0];
+    return result;
   }
 
   @DoNotStrip
-  private double[] measureViewByNativeId(String nativeID) {
+  WritableMap measureViewByNativeId(String nativeID) {
     try {
       View view = ReactFindViewUtil.findView(context.getCurrentActivity().getWindow().getDecorView(), nativeID);
       return measure(view);
     } catch (IllegalViewOperationException e) {
       e.printStackTrace();
     }
-    return new double[]{};
+    return emptyMeasure();
   }
 
   @DoNotStrip
-  private double[] measureText(
+  WritableMap measureText(
     String t,
     @Nullable String fontFamily,
     @Nullable String weight,
@@ -202,7 +139,12 @@ public class JsiViewHelpers {
 
     final String _text = conf.getString("text");
     if (_text == null) {
-      return new double[0];
+      WritableMap result = Arguments.createMap();
+      result.putDouble("width", 0);
+      result.putDouble("height", 0);
+      result.putDouble("lineCount", 0);
+      result.putDouble("lastLineWidth", 0);
+      return result;
     }
 
     final float density = getCurrentDensity();
@@ -210,7 +152,12 @@ public class JsiViewHelpers {
     final boolean includeFontPadding = conf.includeFontPadding;
 
     if (_text.isEmpty()) {
-      return new double[] {minimalHeight(density, includeFontPadding), 0, 0, 0};
+      WritableMap result = Arguments.createMap();
+      result.putDouble("width", 0);
+      result.putDouble("height", minimalHeight(density, includeFontPadding));
+      result.putDouble("lineCount", 0);
+      result.putDouble("lastLineWidth", 0);
+      return result;
     }
 
     final SpannableString text = (SpannableString) RNTextSizeSpannedText
@@ -282,10 +229,21 @@ public class JsiViewHelpers {
         rectWidth = layout.getWidth();
       }
 
-      return new double[]{ layout.getHeight() / density, rectWidth / density, lineCount, lastLineWidth};
+      WritableMap result = Arguments.createMap();
+      result.putDouble("width", rectWidth / density);
+      result.putDouble("height", layout.getHeight() / density);
+      result.putDouble("lineCount", lineCount);
+      result.putDouble("lastLineWidth", lastLineWidth);
+
+      return result;
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
+      WritableMap result = Arguments.createMap();
+      result.putDouble("width", 0);
+      result.putDouble("height", 0);
+      result.putDouble("lineCount", 0);
+      result.putDouble("lastLineWidth", 0);
+      return result;
     }
   }
 
@@ -318,5 +276,50 @@ public class JsiViewHelpers {
   @SuppressWarnings("deprecation")
   private float getCurrentDensity() {
     return DisplayMetricsHolder.getWindowDisplayMetrics().density;
+  }
+
+  private static void computeBoundingBox(View view, int[] outputBuffer) {
+    RectF boundingBox = new RectF();
+    boundingBox.set(0, 0, view.getWidth(), view.getHeight());
+    mapRectFromViewToWindowCoords(view, boundingBox);
+
+    outputBuffer[0] = Math.round(boundingBox.left);
+    outputBuffer[1] = Math.round(boundingBox.top);
+    outputBuffer[2] = Math.round(boundingBox.right - boundingBox.left);
+    outputBuffer[3] = Math.round(boundingBox.bottom - boundingBox.top);
+  }
+
+  private static void mapRectFromViewToWindowCoords(View view, RectF rect) {
+    Matrix matrix = view.getMatrix();
+    if (!matrix.isIdentity()) {
+      matrix.mapRect(rect);
+    }
+
+    rect.offset(view.getLeft(), view.getTop());
+
+    ViewParent parent = view.getParent();
+    while (parent instanceof View) {
+      View parentView = (View) parent;
+
+      rect.offset(-parentView.getScrollX(), -parentView.getScrollY());
+
+      matrix = parentView.getMatrix();
+      if (!matrix.isIdentity()) {
+        matrix.mapRect(rect);
+      }
+
+      rect.offset(parentView.getLeft(), parentView.getTop());
+
+      parent = parentView.getParent();
+    }
+  }
+
+  private WritableMap emptyMeasure() {
+    WritableMap result = Arguments.createMap();
+    result.putDouble("width", 0);
+    result.putDouble("height", 0);
+    result.putDouble("x", 0);
+    result.putDouble("y", 0);
+    return result;
   }
 }

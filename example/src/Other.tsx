@@ -10,14 +10,21 @@ const text =
 
 export default function Other() {
   const viewRef = useRef<TouchableOpacity>(null);
+  const viewRef2 = useRef<TouchableOpacity>(null);
+  const viewRef3 = useRef<TouchableOpacity>(null);
 
   return (
     <View style={styles.container} accessibilityLabel={'baseContainer'}>
-      <Text ref={viewRef} children={text} style={{}} />
+      {/*<Text ref={viewRef} children={text} style={{}} />*/}
 
       <TouchableOpacity
         ref={viewRef}
-        style={{ width: 100, height: 200, backgroundColor: 'yellow' }}
+        style={{
+          width: 90,
+          height: 300,
+          backgroundColor: 'yellow',
+          marginTop: 100,
+        }}
         onPress={() => {
           console.log('[App.measure]', viewHelpers.measureView(viewRef));
         }}
@@ -27,7 +34,7 @@ export default function Other() {
       <TouchableOpacity
         accessibilityLabel={'withNativeId'}
         nativeID={'someAwesomeId'}
-        ref={viewRef}
+        ref={viewRef2}
         style={{ width: 100, height: 200, backgroundColor: 'yellow' }}
         onPress={(event) => {
           console.log(
@@ -44,7 +51,7 @@ export default function Other() {
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        ref={viewRef}
+        ref={viewRef3}
         style={{ width: 100, height: 200, backgroundColor: 'yellow' }}
         onPress={() => {
           const fs = 14;
