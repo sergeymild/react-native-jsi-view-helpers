@@ -1,6 +1,6 @@
 {
-  "name": "react-native-jsi-view-helpers",
-  "version": "2.0.1",
+  "name": "react-native-jsi-view-helpers3",
+  "version": "2.0.2",
   "description": "E",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
@@ -36,8 +36,7 @@
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build",
-    "postinstall": "cd example && yarn install && npx pod-install && cd .."
+    "prepare": "bob build"
   },
   "keywords": [
     "react-native",
