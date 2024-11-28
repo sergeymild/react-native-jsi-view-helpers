@@ -88,14 +88,20 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
             
             NSString *fontFamily = nil;
             if (params.hasProperty(runtime, "fontFamily")) {
-                auto rawFontFamily = params.getProperty(runtime, "fontFamily").asString(runtime).utf8(runtime);
+              auto pr = params.getProperty(runtime, "fontFamily");
+              if (!(pr.isUndefined() || pr.isNull())) {
+                auto rawFontFamily = pr.asString(runtime).utf8(runtime);
                 fontFamily = [NSString stringWithUTF8String:rawFontFamily.c_str()];
+              }
             }
         
             NSString *weight = nil;
             if (params.hasProperty(runtime, "weight")) {
-                auto rawWeight = params.getProperty(runtime, "weight").asString(runtime).utf8(runtime);
+              auto pr = params.getProperty(runtime, "weight");
+              if (!(pr.isUndefined() || pr.isNull())) {
+                auto rawWeight = pr.asString(runtime).utf8(runtime);
                 weight = [NSString stringWithUTF8String:rawWeight.c_str()];
+              }
             }
             
             auto text = [NSString stringWithUTF8String:rawText.c_str()];

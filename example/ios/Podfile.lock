@@ -13,11 +13,6 @@ PODS:
     - fmt (= 9.1.0)
     - glog
     - RCT-Folly/Default (= 2024.01.01.00)
-  - RCT-Folly/Default (2024.01.01.00):
-    - boost
-    - DoubleConversion
-    - fmt (= 9.1.0)
-    - glog
   - RCT-Folly/Fabric (2024.01.01.00):
     - boost
     - DoubleConversion
@@ -935,7 +930,7 @@ PODS:
   - React-Mapbuffer (0.74.1):
     - glog
     - React-debug
-  - react-native-jsi-view-helpers (1.0.5):
+  - react-native-jsi-view-helpers (1.0.8):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1366,12 +1361,12 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
-  DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
+  DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385
   FBLazyVector: 898d14d17bf19e2435cafd9ea2a1033efe445709
-  fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
-  glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
+  fmt: 10c6e61f4be25dc963c36bd73fc7b1705fe975be
+  glog: 08b301085f15bcbb6ff8632a8ebaf239aae04e6a
   hermes-engine: 16b8530de1b383cdada1476cf52d1b52f0692cbc
-  RCT-Folly: 02617c592a293bd6d418e0a88ff4ee1f88329b47
+  RCT-Folly: bf5c0376ffe4dd2cf438dcf86db385df9fdce648
   RCTDeprecation: efb313d8126259e9294dc4ee0002f44a6f676aba
   RCTRequired: f49ea29cece52aee20db633ae7edc4b271435562
   RCTTypeSafety: a11979ff0570d230d74de9f604f7d19692157bc4
@@ -1395,7 +1390,7 @@ SPEC CHECKSUMS:
   React-jsitracing: 233d1a798fe0ff33b8e630b8f00f62c4a8115fbc
   React-logger: 7e7403a2b14c97f847d90763af76b84b152b6fce
   React-Mapbuffer: 11029dcd47c5c9e057a4092ab9c2a8d10a496a33
-  react-native-jsi-view-helpers: bf104ce0a037075a4b8606cf655c7b4c87bab52e
+  react-native-jsi-view-helpers: e36d61126d834e6c5a5c8679fd3006a40047bfa3
   React-nativeconfig: b0073a590774e8b35192fead188a36d1dca23dec
   React-NativeModulesApple: df46ff3e3de5b842b30b4ca8a6caae6d7c8ab09f
   React-perflogger: 3d31e0d1e8ad891e43a09ac70b7b17a79773003a
@@ -1420,7 +1415,7 @@ SPEC CHECKSUMS:
   React-utils: 3285151c9d1e3a28a9586571fc81d521678c196d
   ReactCommon: f42444e384d82ab89184aed5d6f3142748b54768
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  Yoga: 348f8b538c3ed4423eb58a8e5730feec50bce372
+  Yoga: b9a182ab00cf25926e7f79657d08c5d23c2d03b0
 
 PODFILE CHECKSUM: 2733fb577836c9f5101faccd87565a2ed3b7d03b
 
