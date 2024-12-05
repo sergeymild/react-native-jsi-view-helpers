@@ -1,6 +1,6 @@
 {
   "name": "react-native-jsi-view-helpers3",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "E",
   "main": "src/index.tsx",
   "module": "src/index.tsx",
@@ -24,8 +24,7 @@
     "test": "jest",
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build"
+    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib"
   },
   "keywords": [
     "react-native",
@@ -53,8 +52,7 @@
     "postinstall-postinstall": "^2.1.0",
     "prettier": "^3.0.3",
     "react": "18.3.1",
-    "react-native": "0.76.1",
-    "react-native-builder-bob": "^0.30.3",
+    "react-native": "0.76.3",
     "turbo": "^1.10.7",
     "typescript": "^5.2.2"
   },
@@ -97,19 +95,6 @@
     "trailingComma": "es5",
     "useTabs": false
   },
-  "react-native-builder-bob": {
-    "source": "src",
-    "output": "lib",
-    "targets": [
-      "codegen",
-      ["commonjs", {"esm": true}],
-      ["module", {"esm": true}],
-      [
-        "typescript",
-        {"project": "tsconfig.build.json", "esm": true}
-      ]
-    ]
-  },
   "codegenConfig": {
     "name": "JsiViewHelpersSpec",
     "type": "all",
@@ -120,12 +105,6 @@
     },
     "android": {
       "javaPackageName": "com.jsiviewhelpers"
-    },
-    "includesGeneratedCode": true
-  },
-  "create-react-native-library": {
-    "type": "module-new",
-    "languages": "kotlin-objc",
-    "version": "0.42.2"
+    }
   }
 }
