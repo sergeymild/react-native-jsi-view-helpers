@@ -1,0 +1,53 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+
+/**
+ * Удаляет указанные папки (.cxx и build) в android внутри каждой папки-модуля
+ * @param {string} modulesDir - Путь к папке, содержащей модули
+ */
+function cleanModuleAndroidFolders(modulesDir) {
+    // Проверяем, существует ли директория
+    if (!fs.existsSync(modulesDir)) {
+        console.error(`Directory ${modulesDir} does not exist.`);
+        return;
+    }
+
+    // Читаем содержимое директории (модули)
+    const moduleDirs = fs.readdirSync(modulesDir, { withFileTypes: true });
+
+    for (const moduleDir of moduleDirs) {
+        if (moduleDir.isDirectory()) {
+            const androidPath = path.join(modulesDir, moduleDir.name, 'android');
+
+            // Проверяем, существует ли папка android
+            if (fs.existsSync(androidPath)) {
+                const cxxPath = path.join(androidPath, '.cxx');
+                const buildPath = path.join(androidPath, 'build');
+
+                if (fs.existsSync(cxxPath)) {
+                    console.log(`Deleting folder: ${cxxPath}`);
+                    fs.rmSync(cxxPath, { recursive: true, force: true });
+                }
+
+                if (fs.existsSync(buildPath)) {
+                    console.log(`Deleting folder: ${buildPath}`);
+                    fs.rmSync(buildPath, { recursive: true, force: true });
+                }
+            }
+        }
+    }
+}
+
+// Получаем путь к папке из аргументов командной строки
+const modulesPath = process.argv[2];
+
+if (!modulesPath) {
+    console.error('Please provide the path to the folder containing module directories as an argument.');
+    process.exit(1);
+}
+
+// Запуск функции очистки
+cleanModuleAndroidFolders(modulesPath);
+console.log('Cleanup complete.');
