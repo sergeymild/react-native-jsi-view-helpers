@@ -1,27 +1,44 @@
 package com.jsiviewhelpers;
-import androidx.annotation.NonNull;
 
-import com.facebook.react.ReactPackage;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.facebook.react.TurboReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.uimanager.ViewManager;
+import com.facebook.react.module.model.ReactModuleInfo;
+import com.facebook.react.module.model.ReactModuleInfoProvider;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public class JsiViewHelpersPackage implements ReactPackage {
-  @NonNull
+public class JsiViewHelpersPackage extends TurboReactPackage {
+
+  @Nullable
   @Override
-  public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
-    List<NativeModule> modules = new ArrayList<>();
-    modules.add(new JsiViewHelpersModule(reactContext));
-    return modules;
+  public NativeModule getModule(@NonNull String name, @NonNull ReactApplicationContext context) {
+    if (JsiViewHelpersModule.NAME.equals(name)) {
+      return new JsiViewHelpersModule(context);
+    }
+    return null;
   }
 
-  @NonNull
   @Override
-  public List<ViewManager> createViewManagers(@NonNull ReactApplicationContext reactContext) {
-    return Collections.emptyList();
+  public ReactModuleInfoProvider getReactModuleInfoProvider() {
+    return () -> {
+      Map<String, ReactModuleInfo> moduleInfoMap = new HashMap<>();
+      moduleInfoMap.put(
+        JsiViewHelpersModule.NAME,
+        new ReactModuleInfo(
+          JsiViewHelpersModule.NAME,
+          JsiViewHelpersModule.NAME,
+          false, // canOverrideExistingModule
+          false, // needsEagerInit
+          false, // isCxxModule
+          true   // isTurboModule
+        )
+      );
+      return moduleInfoMap;
+    };
   }
 }

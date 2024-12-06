@@ -1,5 +1,5 @@
 {
-  "name": "react-native-jsi-view-helpers3",
+  "name": "react-native-jsi-view-helpers",
   "version": "2.0.4",
   "description": "E",
   "main": "src/index.tsx",
@@ -8,7 +8,6 @@
   "source": "src/index",
   "files": [
     "src",
-    "lib",
     "android",
     "ios",
     "cpp",
@@ -63,7 +62,6 @@
     "react": "*",
     "react-native": "*"
   },
-
   "eslintConfig": {
     "root": true,
     "extends": [
@@ -97,7 +95,7 @@
   },
   "codegenConfig": {
     "name": "JsiViewHelpersSpec",
-    "type": "all",
+    "type": "modules",
     "jsSrcsDir": "src",
     "outputDir": {
       "ios": "ios/generated",
