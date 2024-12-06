@@ -6,7 +6,8 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "pods": "pod-install --quiet"
+    "pods": "pod-install --quiet",
+    "gen": "cd android; ./gradlew generateCodegenArtifactsFromSchema; cd .."
   },
   "dependencies": {
     "react": "^18.3.1",
