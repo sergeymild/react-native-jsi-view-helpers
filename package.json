@@ -1,6 +1,6 @@
 {
-  "name": "react-native-jsi-view-helpers3",
-  "version": "2.0.4",
+  "name": "react-native-jsi-view-helpers",
+  "version": "3.0.2",
   "description": "E",
   "main": "src/index.tsx",
   "module": "src/index.tsx",
@@ -8,7 +8,6 @@
   "source": "src/index",
   "files": [
     "src",
-    "lib",
     "android",
     "ios",
     "cpp",
@@ -54,7 +53,10 @@
     "react": "18.3.1",
     "react-native": "0.76.3",
     "turbo": "^1.10.7",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "@react-native-community/cli": "16.0.0",
+    "@react-native-community/cli-platform-android": "16.0.0",
+    "@react-native-community/cli-platform-ios": "^16.0.0"
   },
   "resolutions": {
     "@types/react": "18.3.1"
@@ -63,7 +65,6 @@
     "react": "*",
     "react-native": "*"
   },
-
   "eslintConfig": {
     "root": true,
     "extends": [
@@ -97,7 +98,7 @@
   },
   "codegenConfig": {
     "name": "JsiViewHelpersSpec",
-    "type": "all",
+    "type": "modules",
     "jsSrcsDir": "src",
     "outputDir": {
       "ios": "ios/generated",
