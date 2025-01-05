@@ -48,16 +48,3 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation("com.facebook.react:hermes-android")
 }
-
-def isNewArchitectureEnabled() {
-    return rootProject.hasProperty("newArchEnabled") && rootProject.getProperty("newArchEnabled") == "true"
-}
-
-//if (isNewArchitectureEnabled()) {
-//    // Since our library doesn't invoke codegen automatically we need to do it here.
-//    tasks.register('invokeLibraryCodegen', Exec) {
-//        workingDir "$rootDir/../../"
-//        commandLine "npx", "bob", "build", "--target", "codegen"
-//    }
-//    preBuild.dependsOn invokeLibraryCodegen
-//}
