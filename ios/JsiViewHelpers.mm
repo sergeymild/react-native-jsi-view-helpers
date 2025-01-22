@@ -54,164 +54,211 @@ RCTBridge *_bridge;
 jsi::Runtime *_runtime;
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
-    NSLog(@"Installing JsiViewHelpers polyfill Bindings...");
+  NSLog(@"Installing JsiViewHelpers polyfill Bindings...");
+  
+  _bridge = [RCTBridge currentBridge];
+  _cxxBridge = (RCTCxxBridge*)_bridge;
+  if (_cxxBridge == nil) return @false;
+  _runtime = (jsi::Runtime*) _cxxBridge.runtime;
+  if (_runtime == nil) return @false;
+  auto& runtime = *_runtime;
+  
+  
+  auto measureText = jsi::Function::createFromHostFunction(runtime,
+                                                           jsi::PropNameID::forUtf8(runtime, "measureText"),
+                                                           1,
+                                                           [](jsi::Runtime& runtime,
+                                                              const jsi::Value& thisArg,
+                                                              const jsi::Value* args,
+                                                              size_t count) -> jsi::Value {
+    auto params = args[0].asObject(runtime);
+    auto rawText = params.getProperty(runtime, "text").asString(runtime).utf8(runtime);
+    auto fontSize = params.getProperty(runtime, "fontSize").asNumber();
+    auto width = params.getProperty(runtime, "maxWidth").asNumber();
+    auto allowFontScaling = true;
+    auto usePreciseWidth = false;
     
-    _bridge = [RCTBridge currentBridge];
-    _cxxBridge = (RCTCxxBridge*)_bridge;
-    if (_cxxBridge == nil) return @false;
-    _runtime = (jsi::Runtime*) _cxxBridge.runtime;
-    if (_runtime == nil) return @false;
-    auto& runtime = *_runtime;
+    if (params.hasProperty(runtime, "allowFontScaling")) {
+      allowFontScaling = params.getProperty(runtime, "allowFontScaling").getBool();
+    }
     
+    if (params.hasProperty(runtime, "usePreciseWidth")) {
+      usePreciseWidth = params.getProperty(runtime, "usePreciseWidth").getBool();
+    }
     
-    auto measureText = jsi::Function::createFromHostFunction(runtime,
-                                                                     jsi::PropNameID::forUtf8(runtime, "measureText"),
-                                                                     1,
-                                                                     [](jsi::Runtime& runtime,
-                                                                        const jsi::Value& thisArg,
-                                                                        const jsi::Value* args,
-                                                                        size_t count) -> jsi::Value {
-            auto params = args[0].asObject(runtime);
-            auto rawText = params.getProperty(runtime, "text").asString(runtime).utf8(runtime);
-            auto fontSize = params.getProperty(runtime, "fontSize").asNumber();
-            auto width = params.getProperty(runtime, "maxWidth").asNumber();
-            auto allowFontScaling = true;
-            auto usePreciseWidth = false;
-            
-            if (params.hasProperty(runtime, "allowFontScaling")) {
-                allowFontScaling = params.getProperty(runtime, "allowFontScaling").getBool();
-            }
-            
-            if (params.hasProperty(runtime, "usePreciseWidth")) {
-                usePreciseWidth = params.getProperty(runtime, "usePreciseWidth").getBool();
-            }
-            
-            NSString *fontFamily = nil;
-            if (params.hasProperty(runtime, "fontFamily")) {
-              auto pr = params.getProperty(runtime, "fontFamily");
-              if (!(pr.isUndefined() || pr.isNull())) {
-                auto rawFontFamily = pr.asString(runtime).utf8(runtime);
-                fontFamily = [NSString stringWithUTF8String:rawFontFamily.c_str()];
-              }
-            }
-        
-            NSString *weight = nil;
-            if (params.hasProperty(runtime, "weight")) {
-              auto pr = params.getProperty(runtime, "weight");
-              if (!(pr.isUndefined() || pr.isNull())) {
-                auto rawWeight = pr.asString(runtime).utf8(runtime);
-                weight = [NSString stringWithUTF8String:rawWeight.c_str()];
-              }
-            }
-            
-            auto text = [NSString stringWithUTF8String:rawText.c_str()];
-
-            auto result = [[[RNTextSize alloc] init] measure:text
-                                         width:[[NSNumber alloc] initWithDouble:width]
-                                      fontSize:[[NSNumber alloc] initWithDouble:fontSize]
-                               usePreciseWidth:usePreciseWidth
-                              allowFontScaling:allowFontScaling
-                                    fontFamily:fontFamily
-                                        weight:weight];
-            
-            return convertNSDictionaryToJSIObject(runtime, result);
-        });
-        
-        auto measureView = jsi::Function::createFromHostFunction(runtime,
-                                                                     jsi::PropNameID::forUtf8(runtime, "measureView"),
-                                                                     1,
-                                                                     [self](jsi::Runtime& runtime,
-                                                                        const jsi::Value& thisArg,
-                                                                        const jsi::Value* args,
-                                                                        size_t count) -> jsi::Value {
-            
-            auto viewId = args[0].asNumber();
-            __block CGRect viewFrame = CGRectZero;
-            __block CGRect globalBounds = CGRectZero;
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                auto idNumber = [[NSNumber alloc] initWithDouble:viewId];
-                auto view = [_bridge.uiManager viewForReactTag: idNumber];
-                UIView *rootView = view;
-                if (view != nil) {
-                    viewFrame = view.frame;
-                    while (rootView.superview && ![rootView isReactRootView]) {
-                        rootView = rootView.superview;
-                    }
-                    if (rootView) {
-                        globalBounds = [view convertRect:view.bounds toView:rootView];
-                    }
-                }
-            });
-            
-            
-            
-            if (CGRectIsEmpty(globalBounds)) return jsi::Value::undefined();
-            
-            jsi::Object result = jsi::Object(runtime);
-            result.setProperty(runtime, "width", jsi::Value(globalBounds.size.width));
-            result.setProperty(runtime, "height", jsi::Value(globalBounds.size.height));
-            result.setProperty(runtime, "x", jsi::Value(globalBounds.origin.x));
-            result.setProperty(runtime, "y", jsi::Value(globalBounds.origin.y));
-            
-            return result;
-        });
+    NSString *fontFamily = nil;
+    if (params.hasProperty(runtime, "fontFamily")) {
+      auto rawFontFamily = params.getProperty(runtime, "fontFamily").asString(runtime).utf8(runtime);
+      fontFamily = [NSString stringWithUTF8String:rawFontFamily.c_str()];
+    }
     
-    auto scrollToChild = jsi::Function::createFromHostFunction(runtime,
-                                                               jsi::PropNameID::forUtf8(runtime, "scrollToChild"),
-                                                               1,
-                                                               [](jsi::Runtime& runtime,
+    NSString *weight = nil;
+    if (params.hasProperty(runtime, "weight")) {
+      auto rawWeight = params.getProperty(runtime, "weight").asString(runtime).utf8(runtime);
+      weight = [NSString stringWithUTF8String:rawWeight.c_str()];
+    }
+    
+    auto text = [NSString stringWithUTF8String:rawText.c_str()];
+    
+    auto result = [[[RNTextSize alloc] init] measure:text
+                                               width:[[NSNumber alloc] initWithDouble:width]
+                                            fontSize:[[NSNumber alloc] initWithDouble:fontSize]
+                                     usePreciseWidth:usePreciseWidth
+                                    allowFontScaling:allowFontScaling
+                                          fontFamily:fontFamily
+                                              weight:weight];
+    
+    return convertNSDictionaryToJSIObject(runtime, result);
+  });
+  
+  auto measureView = jsi::Function::createFromHostFunction(runtime,
+                                                           jsi::PropNameID::forUtf8(runtime, "measureView"),
+                                                           1,
+                                                           [self](jsi::Runtime& runtime,
                                                                   const jsi::Value& thisArg,
                                                                   const jsi::Value* args,
                                                                   size_t count) -> jsi::Value {
-        
-        
-        auto params = args[0].asObject(runtime);
-        auto childId = params.getProperty(runtime, "childNativeID").asString(runtime).utf8(runtime);
-        auto offset = params.getProperty(runtime, "offset").asNumber();
-        auto scrollToEnd = params.getProperty(runtime, "scrollToEnd").getBool();
-        
-        auto scrollId = params.getProperty(runtime, "scrollViewId");
-        auto scrollNativeId = params.getProperty(runtime, "scrollNativeID");
-        NSNumber* refScrollId;
-        NSString* nativeScrollId;
-        NSString* nativeChildId = [[NSString alloc] initWithCString:childId.c_str() encoding:NSUTF8StringEncoding];
-
-        if (!scrollId.isNull() && !scrollId.isUndefined()) {
-            refScrollId = [[NSNumber alloc] initWithDouble:scrollId.asNumber()];
-        } else if (!scrollNativeId.isNull() && !scrollNativeId.isUndefined()) {
-            nativeScrollId = [[NSString alloc] initWithCString:scrollNativeId.asString(runtime).utf8(runtime).c_str() encoding:NSUTF8StringEncoding];
+    
+    auto viewId = args[0].asNumber();
+    __block CGRect viewFrame = CGRectZero;
+    __block CGRect globalBounds = CGRectZero;
+    dispatch_sync(dispatch_get_main_queue(), ^{
+      auto idNumber = [[NSNumber alloc] initWithDouble:viewId];
+      auto view = [_bridge.uiManager viewForReactTag: idNumber];
+      UIView *rootView = view;
+      if (view != nil) {
+        viewFrame = view.frame;
+        while (rootView.superview && ![rootView isReactRootView]) {
+          rootView = rootView.superview;
         }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            RCTScrollView *foundScrollView;
-            if (refScrollId != NULL) {
-                UIView* view = [_bridge.uiManager viewForReactTag:refScrollId];
-                foundScrollView = (RCTScrollView*)view;
-            } else if (nativeScrollId != NULL) {
-                UIView* parent = UIApplication.sharedApplication.keyWindow.rootViewController.view;
-                UIView* view = [Scroller findInParent:parent nativeID:nativeScrollId];
-                foundScrollView = (RCTScrollView*)view;
-            }
-            
-            if (foundScrollView == NULL) return;
-            UIView* childView = [Scroller findInParent:foundScrollView nativeID:nativeChildId];
-            [Scroller scrollToView:foundScrollView.scrollView
-                              view:childView
-                            offset:CGFloat(offset)
-                       scrollToEnd:scrollToEnd
-                          animated:true];
-        });
-        
-        return jsi::Value::undefined();
+        if (rootView) {
+          globalBounds = [view convertRect:view.bounds toView:rootView];
+        }
+      }
     });
     
-    jsi::Object viewHelpers = jsi::Object(runtime);
-    viewHelpers.setProperty(runtime, "measureView", std::move(measureView));
-    viewHelpers.setProperty(runtime, "measureText", std::move(measureText));
-    viewHelpers.setProperty(runtime, "scrollToChild", std::move(scrollToChild));
-    runtime.global().setProperty(runtime, "__viewHelpers", std::move(viewHelpers));
     
-    return @true;
+    
+    if (CGRectIsEmpty(globalBounds)) return jsi::Value::undefined();
+    
+    jsi::Object result = jsi::Object(runtime);
+    result.setProperty(runtime, "width", jsi::Value(globalBounds.size.width));
+    result.setProperty(runtime, "height", jsi::Value(globalBounds.size.height));
+    result.setProperty(runtime, "x", jsi::Value(globalBounds.origin.x));
+    result.setProperty(runtime, "y", jsi::Value(globalBounds.origin.y));
+    
+    return result;
+  });
+  
+  auto measureViewByNativeId = jsi::Function::createFromHostFunction(runtime,
+                                                           jsi::PropNameID::forUtf8(runtime, "measureViewByNativeId"),
+                                                           1,
+                                                           [self](jsi::Runtime& runtime,
+                                                                  const jsi::Value& thisArg,
+                                                                  const jsi::Value* args,
+                                                                  size_t count) -> jsi::Value {
+    
+    auto viewId = args[0].asString(runtime).utf8(runtime);
+    __block CGRect viewFrame = CGRectZero;
+    __block CGRect globalBounds = CGRectZero;
+    
+    NSString* nativeViewId = [[NSString alloc] initWithCString:viewId.c_str() encoding:NSUTF8StringEncoding];
+    
+    dispatch_sync(dispatch_get_main_queue(), ^{
+      
+      UIView* parent = RCTKeyWindow().rootViewController.view;
+      UIView* view = [Scroller findInParent:parent nativeID:nativeViewId];
+      auto presented = RCTPresentedViewController();
+      if (!view && presented && presented.view) {
+        view = [Scroller findInParent:presented.view nativeID:nativeViewId];
+      }
+
+      UIView *rootView = view;
+      if (view != nil) {
+        viewFrame = view.frame;
+        while (rootView.superview && ![rootView isReactRootView]) {
+          rootView = rootView.superview;
+        }
+        if (rootView) {
+          globalBounds = [view convertRect:view.bounds toView:rootView];
+        }
+      }
+    });
+    
+    
+    
+    if (CGRectIsEmpty(globalBounds)) return jsi::Value::undefined();
+    
+    jsi::Object result = jsi::Object(runtime);
+    result.setProperty(runtime, "width", jsi::Value(globalBounds.size.width));
+    result.setProperty(runtime, "height", jsi::Value(globalBounds.size.height));
+    result.setProperty(runtime, "x", jsi::Value(globalBounds.origin.x));
+    result.setProperty(runtime, "y", jsi::Value(globalBounds.origin.y));
+    
+    return result;
+  });
+  
+  auto scrollToChild = jsi::Function::createFromHostFunction(runtime,
+                                                             jsi::PropNameID::forUtf8(runtime, "scrollToChild"),
+                                                             1,
+                                                             [](jsi::Runtime& runtime,
+                                                                const jsi::Value& thisArg,
+                                                                const jsi::Value* args,
+                                                                size_t count) -> jsi::Value {
+    
+    
+    auto params = args[0].asObject(runtime);
+    auto childId = params.getProperty(runtime, "childNativeID").asString(runtime).utf8(runtime);
+    auto offset = params.getProperty(runtime, "offset").asNumber();
+    auto scrollToEnd = params.getProperty(runtime, "scrollToEnd").getBool();
+    
+    auto scrollId = params.getProperty(runtime, "scrollViewId");
+    auto scrollNativeId = params.getProperty(runtime, "scrollNativeID");
+    NSNumber* refScrollId;
+    NSString* nativeScrollId;
+    NSString* nativeChildId = [[NSString alloc] initWithCString:childId.c_str() encoding:NSUTF8StringEncoding];
+    
+    if (!scrollId.isNull() && !scrollId.isUndefined()) {
+      refScrollId = [[NSNumber alloc] initWithDouble:scrollId.asNumber()];
+    } else if (!scrollNativeId.isNull() && !scrollNativeId.isUndefined()) {
+      nativeScrollId = [[NSString alloc] initWithCString:scrollNativeId.asString(runtime).utf8(runtime).c_str() encoding:NSUTF8StringEncoding];
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+      RCTScrollView *foundScrollView;
+      if (refScrollId != NULL) {
+        UIView* view = [_bridge.uiManager viewForReactTag:refScrollId];
+        foundScrollView = (RCTScrollView*)view;
+      } else if (nativeScrollId != NULL) {
+        UIView* parent = RCTKeyWindow().rootViewController.view;
+        UIView* view = [Scroller findInParent:parent nativeID:nativeScrollId];
+        auto presented = RCTPresentedViewController();
+        if (!view && presented && presented.view) {
+          view = [Scroller findInParent:presented.view nativeID:nativeScrollId];
+        }
+        foundScrollView = (RCTScrollView*)view;
+      }
+      
+      if (foundScrollView == NULL) return;
+      UIView* childView = [Scroller findInParent:foundScrollView nativeID:nativeChildId];
+      [Scroller scrollToView:foundScrollView.scrollView
+                        view:childView
+                      offset:CGFloat(offset)
+                 scrollToEnd:scrollToEnd
+                    animated:true];
+    });
+    
+    return jsi::Value::undefined();
+  });
+  
+  jsi::Object viewHelpers = jsi::Object(runtime);
+  viewHelpers.setProperty(runtime, "measureView", std::move(measureView));
+  viewHelpers.setProperty(runtime, "measureViewByNativeId", std::move(measureViewByNativeId));
+  viewHelpers.setProperty(runtime, "measureText", std::move(measureText));
+  viewHelpers.setProperty(runtime, "scrollToChild", std::move(scrollToChild));
+  runtime.global().setProperty(runtime, "__viewHelpers", std::move(viewHelpers));
+  
+  return @true;
 }
 
 @end
