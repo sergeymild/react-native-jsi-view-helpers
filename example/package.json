@@ -10,8 +10,8 @@
     "gen": "cd android; ./gradlew generateCodegenArtifactsFromSchema; cd .."
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-native": "0.76.3"
+    "react": "^19.0.0",
+    "react-native": "0.78.0"
   },
   "devDependencies": {
     "babel-plugin-module-resolver": "^5.0.2",
@@ -25,10 +25,10 @@
     "@react-native-community/cli": "16.0.0",
     "@react-native-community/cli-platform-android": "16.0.0",
     "@react-native-community/cli-platform-ios": "^16.0.0",
-    "@react-native/babel-preset": "0.76.3",
-    "@react-native/metro-config": "0.76.3",
-    "@react-native/typescript-config": "0.76.3",
-    "react-native-builder-bob": "^0.33.3"
+    "@react-native/babel-preset": "0.78.0",
+    "@react-native/metro-config": "0.78.0",
+    "@react-native/typescript-config": "0.78.0",
+    "react-native-builder-bob": "^0.37.0"
   },
   "engines": {
     "node": ">=18"
