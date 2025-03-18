@@ -63,7 +63,7 @@ export class viewHelpers {
           scrollToEnd?: boolean;
         }
       | {
-          scrollViewRef: React.RefObject<ScrollView>;
+          scrollViewRef: React.RefObject<ScrollView | null>;
           childNativeID: string;
           offset?: number;
           scrollToEnd?: boolean;
@@ -74,7 +74,7 @@ export class viewHelpers {
         'scrollNativeID' in params ? params.scrollNativeID : undefined,
       scrollViewId:
         'scrollViewRef' in params
-          ? (findNodeHandle(params.scrollViewRef.current) ?? undefined)
+          ? (findNodeHandle(params.scrollViewRef?.current) ?? undefined)
           : undefined,
       childNativeID: params.childNativeID,
       offset: params.offset ?? 0,
